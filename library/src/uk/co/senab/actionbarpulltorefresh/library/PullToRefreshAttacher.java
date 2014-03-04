@@ -20,23 +20,17 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-
-import java.util.WeakHashMap;
-
+import android.view.*;
+import android.widget.FrameLayout;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.HeaderViewListener;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.ViewDelegate;
+
+import java.util.WeakHashMap;
 
 public class PullToRefreshAttacher {
 
@@ -123,7 +117,9 @@ public class PullToRefreshAttacher {
         decorView.post(new Runnable() {
             @Override
             public void run() {
-                if (decorView.getWindowToken() != null) {
+                if (mHeaderView == null) {
+                    // do nothing
+                } else if (decorView.getWindowToken() != null) {
                     // The Decor View has a Window Token, so we can add the HeaderView!
                     addHeaderViewToActivity(mHeaderView);
                 } else {
@@ -590,52 +586,48 @@ public class PullToRefreshAttacher {
     }
 
     protected void addHeaderViewToActivity(View headerView) {
-        // Get the Display Rect of the Decor View
-        mActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(mRect);
-
-        // Honour the requested layout params
-        int width = WindowManager.LayoutParams.MATCH_PARENT;
-        int height = WindowManager.LayoutParams.WRAP_CONTENT;
+// Get the Display Rect of the Decor View
+//mActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(mRect);
         ViewGroup.LayoutParams requestedLp = headerView.getLayoutParams();
-        if (requestedLp != null) {
-            width = requestedLp.width;
-            height = requestedLp.height;
-        }
-
-        // Create LayoutParams for adding the View as a panel
-        WindowManager.LayoutParams wlp = new WindowManager.LayoutParams(width, height,
-                WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                PixelFormat.TRANSLUCENT);
-        wlp.x = 0;
-        wlp.y = mRect.top;
-        wlp.gravity = Gravity.TOP;
+// Create LayoutParams for adding the View as a panel
+//WindowManager.LayoutParams wlp = new WindowManager.LayoutParams(width, height,
+// WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
+// WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+// PixelFormat.TRANSLUCENT);
+//wlp.x = 0;
+//wlp.y = mRect.top;
+//wlp.gravity = Gravity.TOP;
 
         // Workaround for Issue #182
-        headerView.setTag(wlp);
-        mActivity.getWindowManager().addView(headerView, wlp);
+        //headerView.setTag(wlp);
+        //mActivity.getWindowManager().addView(headerView, wlp);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        headerView.setTag(lp);
+        getAttachTarget().addView(headerView, lp);
     }
 
     protected void updateHeaderViewPosition(View headerView) {
         // Refresh the Display Rect of the Decor View
-        mActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(mRect);
+        //mActivity.getWindow().getDecorView().getWindowVisibleDisplayFrame(mRect);
 
-        WindowManager.LayoutParams wlp = null;
-        if (headerView.getLayoutParams() instanceof WindowManager.LayoutParams) {
-            wlp = (WindowManager.LayoutParams) headerView.getLayoutParams();
-        } else if (headerView.getTag() instanceof  WindowManager.LayoutParams) {
-            wlp = (WindowManager.LayoutParams) headerView.getTag();
+        FrameLayout.LayoutParams wlp = null;
+        if (headerView.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            wlp = (FrameLayout.LayoutParams) headerView.getLayoutParams();
+        } else if (headerView.getTag() instanceof  FrameLayout.LayoutParams) {
+            wlp = (FrameLayout.LayoutParams) headerView.getTag();
         }
 
-        if (wlp != null && wlp.y != mRect.top) {
-            wlp.y = mRect.top;
-            mActivity.getWindowManager().updateViewLayout(headerView, wlp);
+        if (wlp != null) {
+            //wlp.y = mRect.top;
+            getAttachTarget().updateViewLayout(headerView, wlp);
+            //mActivity.getWindowManager().updateViewLayout(headerView, wlp);
         }
     }
 
     protected void removeHeaderViewFromActivity(View headerView) {
         if (headerView.getWindowToken() != null) {
-            mActivity.getWindowManager().removeViewImmediate(headerView);
+            //mActivity.getWindowManager().removeViewImmediate(headerView);
+            getAttachTarget().removeView(headerView);
         }
     }
 
@@ -645,4 +637,16 @@ public class PullToRefreshAttacher {
             minimizeHeader();
         }
     };
+
+    private ViewGroup getAttachTarget() {
+        ViewGroup decorView = (ViewGroup) mActivity.getWindow().getDecorView();
+        View firstChild = decorView.getChildAt(0);
+        if (firstChild instanceof SlidingMenu) {
+            SlidingMenu slidingMenu = (SlidingMenu) firstChild;
+            ViewGroup frame = (ViewGroup) ((ViewGroup) slidingMenu.getContent()).getChildAt(0);
+            return frame;
+        } else {
+            return decorView;
+        }
+    }
 }
