@@ -25,13 +25,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
-import java.util.HashSet;
-
 import uk.co.senab.actionbarpulltorefresh.library.listeners.HeaderViewListener;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import uk.co.senab.actionbarpulltorefresh.library.viewdelegates.ViewDelegate;
 
 /**
@@ -162,7 +157,7 @@ public class PullToRefreshLayout extends FrameLayout {
         super.onConfigurationChanged(newConfig);
     }
 
-    void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
+    public void setPullToRefreshAttacher(PullToRefreshAttacher attacher) {
         if (mPullToRefreshAttacher != null) {
             mPullToRefreshAttacher.destroy();
         }
