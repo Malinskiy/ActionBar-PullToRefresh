@@ -16,10 +16,12 @@
 
 package uk.co.senab.actionbarpulltorefresh.library;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -149,6 +151,7 @@ public class PullToRefreshLayout extends FrameLayout {
         super.onDetachedFromWindow();
     }
 
+    @TargetApi(Build.VERSION_CODES.FROYO)
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         if (mPullToRefreshAttacher != null) {
