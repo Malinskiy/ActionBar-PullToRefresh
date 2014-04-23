@@ -645,8 +645,7 @@ public class PullToRefreshAttacher {
         View firstChild = decorView.getChildAt(0);
         if (firstChild instanceof SlidingMenu) {
             SlidingMenu slidingMenu = (SlidingMenu) firstChild;
-            ViewGroup frame = (ViewGroup) ((ViewGroup) slidingMenu.getContent()).getChildAt(0);
-            return frame;
+            return slidingMenu.getContentDecor();
         } else {
             return decorView;
         }
