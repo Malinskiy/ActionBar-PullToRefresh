@@ -17,6 +17,7 @@
 
 <resources>
 
+    <item type="id" name="ptr_header" />
     <item type="id" name="ptr_content" />
     <item type="id" name="ptr_text" />
     <item type="id" name="ptr_progress" />

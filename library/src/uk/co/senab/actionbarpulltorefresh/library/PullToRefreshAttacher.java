@@ -102,9 +102,12 @@ public class PullToRefreshAttacher {
         final ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
 
         // Create Header view and then add to Decor View
-        mHeaderView = LayoutInflater.from(
-                mEnvironmentDelegate.getContextForInflater(activity)).inflate(
-                options.headerLayout, decorView, false);
+	    mHeaderView = decorView.findViewById(R.id.ptr_header);
+	    if(mHeaderView == null) {
+		    mHeaderView = LayoutInflater.from(
+				    mEnvironmentDelegate.getContextForInflater(activity)).inflate(
+				    options.headerLayout, decorView, false);
+	    }
         if (mHeaderView == null) {
             throw new IllegalArgumentException("Must supply valid layout id for header.");
         }
@@ -603,6 +606,9 @@ public class PullToRefreshAttacher {
         // Workaround for Issue #182
         //headerView.setTag(wlp);
         //mActivity.getWindowManager().addView(headerView, wlp);
+	    if(headerView.getParent() != null) {
+		    ((ViewGroup)headerView.getParent()).removeView(headerView);
+	    }
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         headerView.setTag(lp);
         getAttachTarget().addView(headerView, lp);
