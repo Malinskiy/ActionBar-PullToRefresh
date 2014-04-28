@@ -627,6 +627,9 @@ public class PullToRefreshAttacher {
 
         if (wlp != null) {
             //wlp.y = mRect.top;
+	        if(getAttachTarget().indexOfChild(headerView) == -1) {
+		        addHeaderViewToActivity(headerView);
+	        }
             getAttachTarget().updateViewLayout(headerView, wlp);
             //mActivity.getWindowManager().updateViewLayout(headerView, wlp);
         }
